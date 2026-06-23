@@ -3,26 +3,52 @@
 #include <string>
 #include <iomanip>
 #include <Windows.h>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
 using namespace std;
 
 class Vehicle
 {
-private:
+protected:
 	int id, yearOfManufacture;
 	string type, brand, model;
 	double weight;
 
 public:
-
-	Vehicle(int id, string type, string brand, string model, int yearOfManufacture, double weight) {
-
+	Vehicle(
+		int id,
+		string type,
+		string brand,
+		string model,
+		int yearOfManufacture,
+		double weight)
+	{
 		this->id = id;
 		this->type = type;
 		this->brand = brand;
 		this->model = model;
 		this->yearOfManufacture = yearOfManufacture;
 		this->weight = weight;
+	}
 
+	virtual ~Vehicle() {}
+
+	virtual string getVehicleClass()
+	{
+		return "Транспорт";
+	}
+
+	virtual void show()
+	{
+		cout << left
+			<< setw(5) << id
+			<< setw(20) << getVehicleClass()
+			<< setw(15) << brand
+			<< setw(15) << model
+			<< setw(10) << yearOfManufacture
+			<< setw(10) << weight
+			<< endl;
 	}
 
 	int getId()
@@ -105,33 +131,150 @@ public:
 		weight = value;
 	}
 
-	void show()
+};
+
+class Car : public Vehicle
+{
+public:
+	Car(
+		int id,
+		string type,
+		string brand,
+		string model,
+		int yearOfManufacture,
+		double weight)
+		: Vehicle(
+			id,
+			type,
+			brand,
+			model,
+			yearOfManufacture,
+			weight)
 	{
-		cout << left
-			<< setw(5) << id
-			<< setw(25) << type
-			<< setw(15) << brand
-			<< setw(15) << model
-			<< setw(10) << yearOfManufacture
-			<< setw(10) << weight
-			<< endl;
+	}
+
+	string getVehicleClass() override
+	{
+		return "Автомобиль";
 	}
 };
 
-vector<Vehicle> list;
+class Ship : public Vehicle
+{
+public:
+	Ship(
+		int id,
+		string type,
+		string brand,
+		string model,
+		int yearOfManufacture,
+		double weight)
+		: Vehicle(
+			id,
+			type,
+			brand,
+			model,
+			yearOfManufacture,
+			weight)
+	{
+	}
+
+	string getVehicleClass() override
+	{
+		return "Корабль";
+	}
+};
+
+class Plane : public Vehicle
+{
+public:
+	Plane(
+		int id,
+		string type,
+		string brand,
+		string model,
+		int yearOfManufacture,
+		double weight)
+		: Vehicle(
+			id,
+			type,
+			brand,
+			model,
+			yearOfManufacture,
+			weight)
+	{
+	}
+
+	string getVehicleClass() override
+	{
+		return "Самолёт";
+	}
+};
+
+class SpaceShip : public Vehicle
+{
+public:
+	SpaceShip(
+		int id,
+		string type,
+		string brand,
+		string model,
+		int yearOfManufacture,
+		double weight)
+		: Vehicle(
+			id,
+			type,
+			brand,
+			model,
+			yearOfManufacture,
+			weight)
+	{
+	}
+
+	string getVehicleClass() override
+	{
+		return "Космический корабль";
+	}
+};
+
+vector<Vehicle*> list;
 int ID = 0;
+
+void printTableHeader()
+{
+	cout << left
+		<< setw(5) << "ID"
+		<< setw(25) << "Тип"
+		<< setw(15) << "Марка"
+		<< setw(15) << "Модель"
+		<< setw(10) << "Год"
+		<< setw(10) << "Вес, т"
+		<< endl;
+
+	cout << string(80, '-') << endl;
+}
 
 void regist()
 {
 	int yearOfManufacture;
-	string type, brand, model;
+	string brand, model;
 	double weight;
 
 	cin.ignore();
 
+	cout << "Тип техники:\n";
+	cout << "1) Автомобиль\n";
+	cout << "2) Корабль\n";
+	cout << "3) Самолёт\n";
+	cout << "4) Космический корабль\n";
+
+	int choice;
+	cin >> choice;
+
+	system("cls");
+	cin.ignore();
+
 	SetConsoleCP(1251);
-	cout << "Введите тип транспортного средства: ";
-	getline(cin, type);
 
 	cout << "Введите марку транспортного средства: ";
 	getline(cin, brand);
@@ -146,7 +289,50 @@ void regist()
 	cin >> weight;
 	SetConsoleCP(866);
 
-	list.push_back(Vehicle(++ID, type, brand, model, yearOfManufacture, weight));
+	if (choice == 1)
+	{
+		list.push_back(
+			new Car(
+				++ID,
+				"Автомобиль",
+				brand,
+				model,
+				yearOfManufacture,
+				weight));
+	}
+	else if (choice == 2)
+	{
+		list.push_back(
+			new Ship(
+				++ID,
+				"Корабль",
+				brand,
+				model,
+				yearOfManufacture,
+				weight));
+	}
+	else if (choice == 3)
+	{
+		list.push_back(
+			new Plane(
+				++ID,
+				"Самолёт",
+				brand,
+				model,
+				yearOfManufacture,
+				weight));
+	}
+	else if (choice == 4)
+	{
+		list.push_back(
+			new SpaceShip(
+				++ID,
+				"Космический корабль",
+				brand,
+				model,
+				yearOfManufacture,
+				weight));
+	}
 
 }
 
@@ -167,7 +353,7 @@ void changeEntry()
 
 	for (; i < list.size(); i++)
 	{
-		if (list[i].getId() == entryNum)
+		if (list[i]->getId() == entryNum)
 			break;
 	}
 
@@ -191,15 +377,15 @@ void changeEntry()
 	cin >> option;
 
 	if (option == 1)
-		list[i].changeType();
+		list[i]->changeType();
 	else if (option == 2)
-		list[i].changeBrand();
+		list[i]->changeBrand();
 	else if (option == 3)
-		list[i].changeModel();
+		list[i]->changeModel();
 	else if (option == 4)
-		list[i].changeYearOfManufacture();
+		list[i]->changeYearOfManufacture();
 	else if (option == 5)
-		list[i].changeWeight();
+		list[i]->changeWeight();
 	else 
 		return;
 }
@@ -221,7 +407,7 @@ void deleteEntry()
 
 	for (; i < list.size(); i++)
 	{
-		if (list[i].getId() == entryNum)
+		if (list[i]->getId() == entryNum)
 		{
 			list.erase(list.begin() + i);
 
@@ -254,8 +440,8 @@ void showAllEntries()
 
 	printTableHeader();
 
-	for (Vehicle& vehicle : list)
-		vehicle.show();
+	for (Vehicle* vehicle : list)
+		vehicle->show();
 
 	system("pause");
 
@@ -268,10 +454,10 @@ void searchByType(string text)
 
 	for (; i < list.size(); i++)
 	{
-		if (list[i].getType() == text)
+		if (list[i]->getType() == text)
 		{
 			index = i;
-			list[index].show();
+			list[index]->show();
 		}
 	}
 
@@ -289,10 +475,10 @@ void searchByBrand(string text)
 
 	for (; i < list.size(); i++)
 	{
-		if (list[i].getBrand() == text)
+		if (list[i]->getBrand() == text)
 		{
 			index = i;
-			list[index].show();
+			list[index]->show();
 		}
 	}
 
@@ -310,10 +496,10 @@ void searchByModel(string text)
 
 	for (; i < list.size(); i++)
 	{
-		if (list[i].getModel() == text)
+		if (list[i]->getModel() == text)
 		{
 			index = i;
-			list[index].show();
+			list[index]->show();
 		}
 	}
 
@@ -331,10 +517,10 @@ void searchShowResult(int value)
 
 	for (; i < list.size(); i++)
 	{
-		if (list[i].getYearOfManufacture() == value)
+		if (list[i]->getYearOfManufacture() == value)
 		{
 			index = i;
-			list[index].show();
+			list[index]->show();
 		}
 	}
 
@@ -352,10 +538,10 @@ void searchShowResult(double value)
 
 	for (; i < list.size(); i++)
 	{
-		if (list[i].getWeight() == value)
+		if (list[i]->getWeight() == value)
 		{
 			index = i;
-			list[index].show();
+			list[index]->show();
 		}
 	}
 
@@ -366,20 +552,6 @@ void searchShowResult(double value)
 
 		return;
 	}
-}
-
-void printTableHeader()
-{
-	cout << left
-		<< setw(5) << "ID"
-		<< setw(25) << "Тип"
-		<< setw(15) << "Марка"
-		<< setw(15) << "Модель"
-		<< setw(10) << "Год"
-		<< setw(10) << "Вес, т"
-		<< endl;
-
-	cout << string(80, '-') << endl;
 }
 
 void search()
@@ -502,11 +674,151 @@ void logicOfActions(int& action)
 
 }
 
+void saveToFile()
+{
+	ofstream file("vehicles.txt");
+
+	if (!file)
+	{
+		cout << "Ошибка открытия файла!\n";
+		return;
+	}
+
+	for (Vehicle* vehicle : list)
+	{
+		file << vehicle->getId() << ";"
+			<< vehicle->getType() << ";"
+			<< vehicle->getBrand() << ";"
+			<< vehicle->getModel() << ";"
+			<< vehicle->getYearOfManufacture() << ";"
+			<< vehicle->getWeight()<< ";" << endl;
+	}
+
+	file.close();
+
+	cout << "Данные сохранены!\n";
+}
+
+void loadFromFile()
+{
+	ifstream file("vehicles.txt");
+
+	if (!file)
+	{
+		cout << "Файл не найден!\n";
+		return;
+	}
+
+	if (file.peek() == EOF)
+	{
+		cout << "Файл пуст!\n";
+		return;
+	}
+
+	list.clear();
+
+	string line;
+
+	while (getline(file, line))
+	{
+		string type, brand, model, temp;
+		int id, year;
+		double weight;
+
+		stringstream ss(line);
+
+		getline(ss, temp, ';');
+		id = stoi(temp);
+
+		getline(ss, type, ';');
+		getline(ss, brand, ';');
+		getline(ss, model, ';');
+
+		getline(ss, temp, ';');
+		year = stoi(temp);
+
+		getline(ss, temp, ';');
+		replace(temp.begin(), temp.end(), '.', ',');
+		weight = stod(temp);
+
+		if (type == "Автомобиль")
+		{
+			list.push_back(
+				new Car(
+					id,
+					type,
+					brand,
+					model,
+					year,
+					weight
+				)
+			);
+		}
+		else if (type == "Корабль")
+		{
+			list.push_back(
+				new Ship(
+					id,
+					type,
+					brand,
+					model,
+					year,
+					weight
+				)
+			);
+		}
+		else if (type == "Самолёт")
+		{
+			list.push_back(
+				new Plane(
+					id,
+					type,
+					brand,
+					model,
+					year,
+					weight
+				)
+			);
+		}
+		else if (type == "Космический корабль")
+		{
+			list.push_back(
+				new SpaceShip(
+					id,
+					type,
+					brand,
+					model,
+					year,
+					weight
+				)
+			);
+		}
+		else
+		{
+			cout << "Неизвестный тип техники: "
+				<< type << endl;
+			system("pause");
+		}
+
+		if (id > ID)
+			ID = id;
+	}
+
+	file.close();
+
+	cout << "Данные загружены!\n";
+	system("pause");
+}
+
 int main() {
 	setlocale(LC_ALL, "rus");
 	int action;
 
-	while (true)
+	loadFromFile();
+	
+	bool workFlag = true;
+
+	while (workFlag)
 	{
 		system("cls");
 		cout << "Приложение для регистрации и учёта  транспортных средств\n";
@@ -516,18 +828,22 @@ int main() {
 		cout << "3)Удалить существующую запись\n";
 		cout << "4)Посмотреть список зарегистрированных средств\n";
 		cout << "5)Поиск по выбранному полю\n";
+		cout << "6)Выйти из программы\n";
 
 		cout << "\nЧто вы хотите сделать? ";
 
 		cin >> action;
-		if (action > 0)
+		if (action > 0 && action != 6)
 			logicOfActions(action);
-		else
-			break;
+		else if (action == 6)
+			workFlag = false;
 
 	}
 
+	saveToFile();
 
+	cout << "Завершение работы, до свидания!\n";
+	system("pause");
 
 	return 0;
 }
