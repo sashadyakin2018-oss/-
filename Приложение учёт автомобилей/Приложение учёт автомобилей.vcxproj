@@ -127,7 +127,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="source.cpp" />
+    <ClCompile Include="actions.cpp" />
+    <ClCompile Include="globals.cpp" />
+    <ClCompile Include="logicOfActions.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="actions.h" />
+    <ClInclude Include="globals.h" />
+    <ClInclude Include="logicOfActions.h" />
+    <ClInclude Include="Vehicle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
